@@ -24,8 +24,8 @@ load("./data/Ukraine_poly_adm1.Rdata")
 theme_set(theme_bw())
 
 # Choose a marker
-marker <- "ITS2"
-# marker <- "SSU"
+# marker <- "ITS2"
+marker <- "SSU"
 
 
 # Read data ####
@@ -34,7 +34,7 @@ if(marker == "ITS2") {
     physeq <- readRDS("./data/lotus2_ITS2/ecm_physeq.Rdata")
   } else {
     # AMF only (SSU)
-    physeq <- readRDS(".data//lotus2_SSU_ASVs/amf_physeq.Rdata")
+    physeq <- readRDS("./data/lotus2_SSU_ASVs/amf_physeq.Rdata")
   }
 
 # Adjust the whole phyloseq object ####
@@ -56,11 +56,11 @@ library(Biostrings)
 # Read the FASTA file
 if (marker == "ITS2") {           # ITS2
   ref_seqs <- readDNAStringSet(
-    "data/lotus2_ITS2/OTU.fna", 
+    "./data/lotus2_ITS2/OTU.fna", 
     format = "fasta")
 } else {                          # SSU
   ref_seqs <- readDNAStringSet(
-    ".data/lotus2_SSU_ASVs/OTU.fna", 
+    "./data/lotus2_SSU_ASVs/OTU.fna", 
     format = "fasta")
 }
 
@@ -137,7 +137,10 @@ sample_data(physeq)$Vegetation[
 
 # Filter Fungi only
 fungi <- subset_taxa(physeq, Domain == "Fungi")
-
+# There's an issue in the original data for SSU - 
+# in the Domain variable only Eukaryota.
+# Change it manually in filter above if you are using SSU marker.
+# fungi <- physeq # for SSU only!
 
 # Explore data ####
 # See unique Phyla
