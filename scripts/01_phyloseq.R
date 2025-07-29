@@ -1,5 +1,8 @@
 # # Install {phyloseq} package
 # Installation instructions: https://joey711.github.io/phyloseq/install.html
+# RTools (https://cran.r-project.org/bin/windows/Rtools/) needs to be install 
+# first for MS Windows machines.
+# 
 # source("https://raw.githubusercontent.com/joey711/phyloseq/master/inst/scripts/installer.R",
 #        local = TRUE)
 # 
@@ -24,8 +27,8 @@ load("./data/Ukraine_poly_adm1.Rdata")
 theme_set(theme_bw())
 
 # Choose a marker
-# marker <- "ITS2"
-marker <- "SSU"
+marker <- "ITS2"
+# marker <- "SSU"
 
 
 # Read data ####
@@ -132,7 +135,7 @@ table(sample_data(physeq)$Vegetation)
 
 sample_data(physeq)$Vegetation[
   sample_data(physeq)$Vegetation == "deciduoud_forest"
-] <- "forest_deciduous"
+] <- "deciduous_forest"
 
 
 # Filter Fungi only
@@ -158,7 +161,7 @@ plot_bar(fungi, fill = "Family")
 p_phylum <- plot_bar(fungi, fill = "Phylum") +
   coord_flip()
 
-# plot(p_phylum)
+plot(p_phylum)
 
 png(
   "./figures/phylum_sample_hist.png",
@@ -270,5 +273,17 @@ zyk <- prune_taxa(taxa_sums(zyk) > 0, zyk)
 # Export to Excel
 source("./functions/phyloseq_to_MDT_excel.R")
 phyloseq_to_MDT_excel(zyk)
+
+# Export all data to Excel
+phyloseq_to_MDT_excel(physeq)
+
+
+# Export selected reference sequences to fasta format
+physeq %>%
+  refseq() %>%
+  Biostrings::writeXStringSet("otus.fna", append = FALSE, compress = FALSE, 
+                              compression_level = NA,
+                              format = "fasta")
+
 
 # End of the script ####
