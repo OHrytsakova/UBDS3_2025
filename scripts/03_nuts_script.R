@@ -11,6 +11,14 @@ data <- read_csv("./nuts/nuts_data_raw.csv")
 head(data)
 summary(data)
 
+# Check for misspellings
+unique(data$species)
+
+data$species[
+  data$species == "peanuts"
+] <- "peanut"
+
+
 # Transform raw data to abundance table and wide format
 data %>%
   group_by(region, sample) %>%
@@ -96,6 +104,71 @@ ggplot(dat_landscapes_sort, aes(x = rank, y = abundance, color = region, shape =
   ylab("abundance") +
   ggtitle("Rank-abundance-curves all regions") +
   theme_bw()
+
+
+# Rarefaction-based richness estimation ####
+# More: https://sites.google.com/view/chao-lab-website/software/inext?authuser=0
+
+# install.packages("iNEXT")
+library(iNEXT)
+
+# Abundance data
+# Transpose the data so species are rows, samples are columns
+data_t <- t(data_wide)
+
+# Convert to a list of abundance vectors per sample
+abundance_list <- apply(data_t, 2, as.integer)
+
+out <- iNEXT(abundance_list, q = 0, datatype = "abundance")
+
+ggiNEXT(out, type = 1)  # sample-size-based rarefaction/extrapolation
+
+
+# calculate estimated richness based on rarefaction
+chao1 <- iNEXT::ChaoRichness(t(data_wide), datatype = "abundance")
+richness_est <- cbind(rownames(chao1), chao1$Estimator) %>% 
+  as.data.frame() %>% 
+  rename(plot = 1,
+         richness = 2) %>% 
+  mutate(richness = as.numeric(richness))
+
+richness_est
+
+
+
+# Incidence approach - sample coverage
+data_t_pa <- ifelse(data_t>0, 1, 0)
+
+m2 <- list(data_t_pa)
+names(m2) <- "IncidenceData - Nuts"
+out.pf <- iNEXT(m2, q = c(0,1,2), datatype = "incidence_raw")
+
+ggiNEXT(out.pf, type = 2)
+
+chao1 <- iNEXT::ChaoRichness(m2, datatype = "incidence_raw")
+
+chao1
+
+
+
+# Incidence approach - species richness
+# Convert counts to presence/absence
+data_inc <- data_wide > 0
+
+# Count in how many samples each species occurs
+species_incidence_freq <- colSums(data_inc)
+
+# Total number of sampling units
+n_units <- nrow(data_wide)
+
+# Create the input for iNEXT
+incidence_input <- list(c(n_units, species_incidence_freq))
+names(incidence_input) <- "IncidenceData - Nuts"
+
+out_inc <- iNEXT(incidence_input, q = 0, datatype = "incidence_freq")
+
+ggiNEXT(out_inc, type = 1)
+
 
 # End of the script ####
 
