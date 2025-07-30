@@ -1,0 +1,23 @@
+library(readxl)
+
+# Зчитати Excel-файл
+data <- read_excel("your_file.xlsx")
+
+# Очистити назви колонок від пробілів і привести до зручного вигляду
+names(data) <- trimws(names(data))
+print(names(data))  # дивимось, як називається єдина колонка
+
+# Припустимо, колонка називається "ID" (послідовності)
+sequences <- as.character(data[[1]])  # перша (і єдина) колонка
+
+# Запис у FASTA-файл
+fasta_file <- file("output.fasta", open = "w")
+
+for (i in seq_along(sequences)) {
+  writeLines(paste0(">seq", i), fasta_file)
+  writeLines(sequences[i], fasta_file)
+}
+
+close(fasta_file)
+
+cat("✅ FASTA-файл створено: output.fasta\n")

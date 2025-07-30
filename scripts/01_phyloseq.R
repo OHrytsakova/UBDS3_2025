@@ -1,8 +1,12 @@
 # # Install {phyloseq} package
+<<<<<<< Updated upstream
 # Installation instructions: https://joey711.github.io/phyloseq/install.html
 # RTools (https://cran.r-project.org/bin/windows/Rtools/) needs to be install 
 # first for MS Windows machines.
 # 
+=======
+# # Installation instructions: https://joey711.github.io/phyloseq/install.html
+>>>>>>> Stashed changes
 # source("https://raw.githubusercontent.com/joey711/phyloseq/master/inst/scripts/installer.R",
 #        local = TRUE)
 # 
@@ -22,6 +26,7 @@ library(tibble)
 
 # Load Ukraine admin boundaries from a file
 load("./data/Ukraine_poly_adm1.Rdata")
+
 
 # Define a default theme for ggplot graphics.
 theme_set(theme_bw())
@@ -49,7 +54,6 @@ get_variable(physeq, "Read_depth")
 
 # Add Site_name to sample table
 sample_data(physeq)$Site_name <- rownames(sample_data(physeq))
-
 
 # Add reference sequences
 # library(BiocManager)
@@ -92,6 +96,10 @@ tax_table <- physeq@tax_table@.Data
 # sample metadata
 sample_data(physeq)     # View
 sample_data <- sample_data(physeq)
+?sample_data
+data(soilrep)
+head(sample_data(soilrep))
+sample_data$ForwardPrimer[1]
 
 # the phylogenetic tree
 phy_tree(physeq)        # View
@@ -105,7 +113,6 @@ ref_seqs_char <- as.character(refseq(physeq))
 
 # Get the taxonomy table
 tax_table_df <- as.data.frame(tax_table(physeq))
-
 # Add reference sequences as a new column
 tax_table_df$Reference_Sequence <- ref_seqs_char
 
@@ -114,9 +121,6 @@ tax_table(physeq) <- as.matrix(tax_table_df)
 
 # Check the updated taxonomy table
 head(tax_table(physeq))
-
-
-
 
 # Data cleaning ####
 # Sample table
